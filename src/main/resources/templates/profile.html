@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <title>My Profile</title>
+    <div th:replace="~{fragments/header :: head}"></div>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="content-container">
+        <div class="content-card">
+            <h2>My Profile</h2>
+            
+            <p style="font-size: 1.2rem;">
+                Welcome, <strong sec:authentication="name" style="color: var(--primary-color);"></strong>!
+            </p>
+            <p>This is your personal profile page.</p>
+            
+            <div sec:authorize="hasRole('ADMIN')">
+                <p style="font-size: 1.1rem; color: var(--success);">You have <strong>ADMIN</strong> privileges.</p>
+            </div>
+            <div sec:authorize="hasRole('USER')">
+                 <p style="font-size: 1.1rem; color: var(--text-light);">You have <strong>USER</strong> privileges.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

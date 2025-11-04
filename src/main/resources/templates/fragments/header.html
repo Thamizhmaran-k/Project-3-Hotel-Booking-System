@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+
+<nav class="navbar" th:fragment="header">
+    <div class="navbar-container">
+        <a class="navbar-brand" th:href="@{/}">HotelBooking</a>
+        <div class="navbar-links">
+            
+            <a sec:authorize="isAnonymous()" th:href="@{/register}" class="nav-link">Register</a>
+            <a sec:authorize="isAnonymous()" th:href="@{/login}" class="nav-link btn btn-outline">Sign In</a>
+            
+            <a sec:authorize="isAuthenticated()" th:href="@{/profile}" class="nav-link">My Profile</a>
+            <a sec:authorize="isAuthenticated()" th:href="@{/my-bookings}" class="nav-link">My Bookings</a>
+            
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/dashboard}" class="nav-link">Admin Panel</a>
+
+            <a sec:authorize="isAuthenticated()" th:href="@{/logout}" class="nav-link btn btn-outline">Logout</a>
+        </div>
+    </div>
+</nav>
+
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Manage Hotels</title>
+    <div th:replace="~{fragments/header :: head}"></div>
+    <style>
+        .content-card-full {
+            width: 95%;
+            max-width: 1200px;
+            background-color: var(--bg-white);
+            padding: 2.5rem;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            box-sizing: border-box;
+            margin: 2rem auto; /* Center the card */
+        }
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        .styled-table thead tr {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            text-align: left;
+        }
+        .styled-table th, .styled-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .styled-table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            width: auto;
+            margin-right: 5px;
+            display: inline-block; /* Fix button alignment */
+        }
+        .action-buttons form {
+            display: inline-block;
+            margin: 0;
+        }
+        .btn-danger { background-color: var(--danger); color: white; border-color: var(--danger);}
+        .btn-danger:hover { background-color: #c82333; border-color: #bd2130;}
+        
+        /* Flash message styles */
+        .flash-message { padding: 1rem; margin-bottom: 1rem; border-radius: 6px; text-align: center; }
+        .flash-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .flash-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="content-container">
+        <div class="content-card-full">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2>Manage Hotels</h2>
+                <a th:href="@{/admin/hotels/add}" class="btn btn-primary" style="width: auto;">Add New Hotel</a>
+            </div>
+
+            <p><a th:href="@{/admin/dashboard}">&laquo; Back to Admin Dashboard</a></p>
+
+            <div th:if="${successMessage}" class="flash-message flash-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="flash-message flash-error" th:text="${errorMessage}"></div>
+            
+            <div th:if="${#lists.isEmpty(hotels)}">
+                <p>No hotels added yet.</p>
+            </div>
+
+            <table class="styled-table" th:unless="${#lists.isEmpty(hotels)}">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>City</th>
+                        <th>Address</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="hotel : ${hotels}">
+                        <td th:text="${hotel.id}">1</td>
+                        <td th:text="${hotel.name}">Grand Hotel</td>
+                        <td th:text="${hotel.city}">New York</td>
+                        <td th:text="${hotel.address}">123 Main St</td>
+                        <td class="action-buttons">
+                            <a th:href="@{/admin/hotels/{hotelId}/rooms(hotelId=${hotel.id})}" class="btn btn-primary btn-small">Manage Rooms</a>
+                            <a th:href="@{/admin/hotels/edit/{id}(id=${hotel.id})}" class="btn btn-outline btn-small">Edit</a>
+                            <form th:action="@{/admin/hotels/delete/{id}(id=${hotel.id})}" method="post" onsubmit="return confirm('Are you sure you want to delete this hotel and ALL its rooms?');">
+                                <button type="submit" class="btn btn-danger btn-small">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</body>
+</html>

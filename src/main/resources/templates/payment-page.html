@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Process Payment</title>
+    <div th:replace="~{fragments/header :: head}"></div>
+     <style>
+        .payment-card { padding: 2rem; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-width: 500px; margin: 2rem auto; text-align: center; }
+        .payment-card h2 { margin-top: 0; }
+        .amount-display { font-size: 1.5rem; font-weight: 600; margin: 1.5rem 0; color: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container">
+        <div class="payment-card">
+            <h2>Simulated Payment</h2>
+            <p>You are about to pay for your booking.</p>
+
+            <div class="amount-display">
+                Total Amount: <span th:text="${#numbers.formatCurrency(totalPrice)}"></span>
+            </div>
+
+            <p style="color: var(--text-light); font-size: 0.9rem;">(This is a simulation. No real payment will be processed.)</p>
+
+             <form th:action="@{/payment/process}" method="post" style="margin-top: 2rem;">
+                 <input type="hidden" name="bookingId" th:value="${booking.id}" />
+                <input type="hidden" name="amount" th:value="${totalPrice}" />
+
+                <button type="submit" class="btn btn-primary">Confirm Payment (Simulated)</button>
+                 <a th:href="@{/my-bookings}" class="btn btn-outline" style="margin-top: 0.5rem;">Cancel Payment</a>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

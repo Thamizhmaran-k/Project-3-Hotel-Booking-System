@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Confirm Booking</title>
+    <div th:replace="~{fragments/header :: head}"></div>
+    <style>
+        .summary-card { padding: 2rem; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-width: 600px; margin: 2rem auto; }
+        .summary-card h2 { margin-top: 0; text-align: center; }
+        .summary-details p { margin-bottom: 0.75rem; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 0.75rem;}
+        .summary-details p:last-child { border-bottom: none; }
+        .summary-details strong { color: var(--text-dark); display: inline-block; min-width: 150px;}
+        .price-total { font-size: 1.3rem; font-weight: 600; margin-top: 1.5rem; text-align: right; color: var(--primary-color);}
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container">
+        <div class="summary-card">
+            <h2>Confirm Your Booking</h2>
+
+            <div class="summary-details">
+                <p><strong>Hotel:</strong> <span th:text="${hotel.name}">Hotel Name</span></p>
+                <p><strong>Room:</strong> <span th:text="${room.roomType}">Room Type</span> (Capacity: <span th:text="${room.capacity}"></span>)</p>
+                <p><strong>Check-in:</strong> <span th:text="${#temporals.format(checkInDate, 'EEE, dd MMM yyyy')}"></span></p>
+                <p><strong>Check-out:</strong> <span th:text="${#temporals.format(checkOutDate, 'EEE, dd MMM yyyy')}"></span></p>
+                
+                <p><strong>Nights:</strong> <span th:text="${numberOfNights}"></span></p>
+                <p><strong>Price per night:</strong> <span th:text="${#numbers.formatCurrency(room.pricePerNight)}"></span></p>
+                <div class="price-total">Total Price: <span th:text="${#numbers.formatCurrency(totalPrice)}"></span></div>
+                </div>
+
+            <form th:action="@{/book/confirm}" method="post" style="margin-top: 2rem;">
+                <input type="hidden" name="roomId" th:value="${room.id}" />
+                <input type="hidden" name="checkInDate" th:value="${checkInDate}" />
+                <input type="hidden" name="checkOutDate" th:value="${checkOutDate}" />
+
+                <button type="submit" class="btn btn-primary">Confirm & Proceed to Payment</button>
+                <a th:href="@{/search(destination=${hotel.city}, checkin=${checkInDate}, checkout=${checkOutDate})}" class="btn btn-outline" style="margin-top: 0.5rem;">Cancel</a>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

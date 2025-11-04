@@ -1,0 +1,280 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #EE2E24;
+    --primary-hover: #c0261f;
+    --text-dark: #333;
+    --text-light: #6c757d;
+    --bg-light: #f8f9fa;
+    --bg-white: #ffffff;
+    --border-color: #dee2e6;
+    --success: #28a745;
+    --danger: #dc3545;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* --- 2. Navigation Bar --- */
+.navbar {
+    background-color: var(--bg-white);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color); /* Now OYO Red */
+    text-decoration: none;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-link {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-link:hover {
+    color: var(--text-dark);
+    background-color: #f1f1f1;
+}
+
+/* --- 3. Buttons --- */
+.btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.btn-primary {
+    background-color: var(--primary-color); /* Now OYO Red */
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover); /* Darker Red */
+    box-shadow: 0 4px 12px rgba(238, 46, 36, 0.2);
+}
+
+.btn-outline {
+    background-color: var(--bg-white);
+    color: var(--primary-color); /* Now OYO Red */
+    border: 2px solid var(--primary-color); /* Now OYO Red */
+    font-weight: 500;
+}
+
+.btn-outline:hover {
+    background-color: var(--primary-color); /* Now OYO Red */
+    color: var(--bg-white);
+}
+
+.navbar-links .btn {
+    width: auto; /* Fix button width in navbar */
+    padding: 0.5rem 1rem;
+}
+
+/* --- 4. Hero & Search Bar (Homepage) --- */
+.hero-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    padding: 6rem 1rem;
+    text-align: center;
+    color: white;
+}
+
+.hero-section h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.hero-section p {
+    font-size: 1.25rem;
+    font-weight: 400;
+    margin-bottom: 2.5rem;
+}
+
+.search-bar-container {
+    background-color: var(--bg-white);
+    border-radius: 8px;
+    padding: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.search-form {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.search-form .form-group {
+    flex-grow: 1; 
+    flex-basis: 200px; 
+    margin-bottom: 0;
+    text-align: left;
+}
+
+.search-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+.search-form input {
+    width: 100%;
+    padding: 0.75rem;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.search-form .btn {
+    flex-grow: 1;
+    flex-basis: 150px; 
+    height: 48px; 
+}
+
+
+/* --- 5. Auth Forms (Login/Register) --- */
+.auth-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1rem;
+    min-height: 80vh;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    background-color: var(--bg-white);
+    padding: 2.5rem;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.auth-card h2 {
+    text-align: center;
+    color: var(--text-dark);
+    margin-top: 0;
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-light);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+.form-group input:focus {
+    border-color: var(--primary-color); /* Now OYO Red */
+    box-shadow: 0 0 0 3px rgba(238, 46, 36, 0.1);
+    outline: none;
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--text-light);
+}
+
+.form-footer a {
+    color: var(--primary-color); /* Now OYO Red */
+    font-weight: 500;
+    text-decoration: none;
+}
+
+/* --- 6. Alerts --- */
+.alert {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    border: 1px solid transparent;
+}
+
+.alert-danger {
+    color: var(--danger);
+    background-color: #fdd;
+    border-color: var(--danger);
+}
+
+.alert-success {
+    color: var(--success);
+    background-color: #d4edda;
+    border-color: var(--success);
+}
+
+/* --- 7. Content Card (Profile) --- */
+.content-container {
+    display: flex;
+    justify-content: center;
+    padding: 4rem 1rem;
+}
+
+.content-card {
+    width: 100%;
+    max-width: 800px;
+    background-color: var(--bg-white);
+    padding: 2.5rem;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}

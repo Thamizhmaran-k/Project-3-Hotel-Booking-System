@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Search Results</title>
+    <div th:replace="~{fragments/header :: head}"></div>
+    <style>
+        .hotel-card {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        .hotel-card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        .room-info {
+            border-top: 1px dashed var(--border-color);
+            padding: 1rem 0;
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+         .room-details span {
+            display: inline-block;
+            margin-right: 15px;
+            color: var(--text-light);
+        }
+         .room-price {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+         }
+        .no-results {
+            text-align: center;
+            color: var(--text-light);
+            margin-top: 3rem;
+            background-color: var(--bg-white);
+            padding: 2rem;
+            border-radius: 8px;
+        }
+        /* Flash message for booking errors */
+        .flash-error {
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            border: 1px solid transparent;
+            color: var(--danger);
+            background-color: #fdd;
+            border-color: var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
+        <h2>Hotels in <span th:text="${city}">City</span></h2>
+        <p>Showing availability from <strong th:text="${#temporals.format(checkInDate, 'dd MMM yyyy')}"></strong> to <strong th:text="${#temporals.format(checkOutDate, 'dd MMM yyyy')}"></strong></p>
+
+         <div th:if="${errorMessage}" class="flash-error" th:text="${errorMessage}"></div>
+
+        <div th:if="${#lists.isEmpty(results)}" class="no-results">
+            <p>Sorry, no hotels found with available rooms for your selected dates and location.</p>
+            <a th:href="@{/}" class="btn btn-primary" style="width: auto; margin-top: 1rem;">Try another search</a>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(results)}">
+            <div th:each="hotel : ${results}" class="hotel-card">
+                <h3 th:text="${hotel.hotelName}">Hotel Name</h3>
+                 <p style="color: var(--text-light); margin-bottom: 0.5rem;" th:text="${hotel.address} + ', ' + ${hotel.city}"></p>
+                 <p th:text="${hotel.description}" style="margin-bottom: 1rem;"></p>
+
+                <h4>Available Rooms:</h4>
+                <div th:each="room : ${hotel.availableRooms}" class="room-info">
+                   <div class.room-details">
+                       <strong th:text="${room.roomType}">Room Type</strong> <br/>
+                       <span>Capacity: <span th:text="${room.capacity}"></span> guests</span>
+                   </div>
+                   <div class="room-price">
+                       <span style="margin-right: 1rem;" th:text="${#numbers.formatCurrency(room.pricePerNight)} + ' / night'">$150.00 / night</span>
+                       
+                       <a th:href="@{/book/{roomId}(roomId=${room.roomId}, checkIn=${checkInDate}, checkOut=${checkOutDate})}" 
+                          class="btn btn-primary" style="width: auto;">Book Now</a>
+                   </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

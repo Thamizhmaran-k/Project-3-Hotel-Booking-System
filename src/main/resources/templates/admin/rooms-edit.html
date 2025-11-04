@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Room</title>
+    <div th:replace="~{fragments/header :: head}"></div>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>Edit Room for <span th:text="${hotelName}">Hotel Name</span></h2>
+
+             <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                 <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+             </div>
+
+            <form th:action="@{/admin/rooms/edit/{roomId}(roomId=${room.id})}"
+                  th:object="${room}"
+                  method="post">
+
+                <input type="hidden" th:field="*{id}" />
+                <input type="hidden" th:field="*{hotelId}" />
+
+                <div class.form-group">
+                    <label for="roomType">Room Type</label>
+                    <input type="text" id="roomType" th:field="*{roomType}" placeholder="e.g., Single, Double, Suite"/>
+                    <p th:if="${#fields.hasErrors('roomType')}"
+                       th:errors="*{roomType}" class="alert alert-danger"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="capacity">Capacity (Guests)</label>
+                    <input type="number" id="capacity" th:field="*{capacity}" min="1"/>
+                    <p th:if="${#fields.hasErrors('capacity')}"
+                       th:errors="*{capacity}" class="alert alert-danger"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="pricePerNight">Price Per Night</label>
+                    <input type="number" step="0.01" id="pricePerNight" th:field="*{pricePerNight}" min="0.01" placeholder="e.g., 150.00"/>
+                     <p th:if="${#fields.hasErrors('pricePerNight')}"
+                       th:errors="*{pricePerNight}" class="alert alert-danger"></p>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update Room</button>
+                 <a th:href="@{/admin/hotels/{hotelId}/rooms(hotelId=${room.hotelId})}" style="display: block; text-align: center; margin-top: 1rem; color: var(--text-light);">Cancel</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

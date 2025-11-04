@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Register</title>
+    <div th:replace="~{fragments/header :: head}"></div>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>Create an Account</h2>
+
+            <div th:if="${param.success}" class="alert alert-success">
+                Registered successfully! Please <a th:href="@{/login}">login</a>.
+            </div>
+
+            <form th:action="@{/register/save}" th:object="${user}" method="post">
+                
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" th:field="*{name}" />
+                    <p th:if="${#fields.hasErrors('name')}" 
+                       th:errors="*{name}" class="alert alert-danger"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" th:field="*{email}" />
+                    <p th:if="${#fields.hasErrors('email')}" 
+                       th:errors="*{email}" class="alert alert-danger"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" th:field="*{password}" />
+                    <p th:if="${#fields.hasErrors('password')}" 
+                       th:errors="*{password}" class="alert alert-danger"></p>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Create Account</button>
+                
+                <div class="form-footer">
+                    Already have an account? <a th:href="@{/login}">Sign In</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
