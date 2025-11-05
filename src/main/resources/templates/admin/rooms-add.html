@@ -7,16 +7,17 @@
 <body>
     <div th:replace="~{fragments/header :: header}"></div>
 
-    <div class="auth-container"> <div class="auth-card">
+    <div class="auth-container">
+        <div class="auth-card">
             <h2>Add Room to <span th:text="${hotelName}">Hotel Name</span></h2>
             
-             <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
-                 <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
-             </div>
-
             <form th:action="@{/admin/hotels/{hotelId}/rooms/add(hotelId=${room.hotelId})}"
                   th:object="${room}"
                   method="post">
+
+                 <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                     <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+                 </div>
 
                 <input type="hidden" th:field="*{hotelId}" />
 

@@ -11,18 +11,18 @@
         <div class="auth-card">
             <h2>Edit Room for <span th:text="${hotelName}">Hotel Name</span></h2>
 
-             <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
-                 <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
-             </div>
-
             <form th:action="@{/admin/rooms/edit/{roomId}(roomId=${room.id})}"
                   th:object="${room}"
                   method="post">
+            
+                 <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                     <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+                 </div>
 
                 <input type="hidden" th:field="*{id}" />
                 <input type="hidden" th:field="*{hotelId}" />
 
-                <div class.form-group">
+                <div class="form-group">
                     <label for="roomType">Room Type</label>
                     <input type="text" id="roomType" th:field="*{roomType}" placeholder="e.g., Single, Double, Suite"/>
                     <p th:if="${#fields.hasErrors('roomType')}"

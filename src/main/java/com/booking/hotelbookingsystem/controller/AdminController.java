@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/admin") // All routes in this controller start with /admin
 public class AdminController {
 
     private final HotelService hotelService;
@@ -38,7 +38,7 @@ public class AdminController {
         this.paymentRepository = paymentRepository;
     }
 
-    // --- UPDATED DASHBOARD METHOD ---
+    // --- THIS IS THE METHOD FOR THE PAGE THAT IS NOT FOUND ---
     @GetMapping("/dashboard")
     public String showAdminDashboard(Model model) {
         // Fetch real counts from the repositories
@@ -48,10 +48,10 @@ public class AdminController {
         // Use the new repository method to count only successful payments
         model.addAttribute("totalSuccessfulPayments", paymentRepository.countByPaymentStatus("SUCCESS"));
         
-        return "admin/dashboard";
+        return "admin/dashboard"; // This tells it to load "admin/dashboard.html"
     }
 
-    // --- Hotel CRUD Methods (No Changes) ---
+    // --- Hotel CRUD Methods ---
 
     @GetMapping("/hotels")
     public String showHotelList(Model model) {
@@ -116,7 +116,7 @@ public class AdminController {
     }
 
     
-    // --- Room CRUD Methods (No Changes) ---
+    // --- Room CRUD Methods ---
 
     @GetMapping("/hotels/{hotelId}/rooms")
     public String showHotelRooms(@PathVariable("hotelId") Long hotelId, Model model, RedirectAttributes redirectAttributes) {
