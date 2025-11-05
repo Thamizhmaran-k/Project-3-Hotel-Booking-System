@@ -14,15 +14,17 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @WebMvcTest(AuthController.class)
 @Import(SecurityConfig.class)
@@ -36,7 +38,7 @@ public class AuthControllerTest {
     private UserService userService;
 
     @MockBean
-    private UserDetailsService userDetailsService; // Mock security dependency
+    private UserDetailsService userDetailsService;
 
     private UserDto userDto;
     private User existingUser;
@@ -51,10 +53,11 @@ public class AuthControllerTest {
     @Test
     @WithAnonymousUser
     void shouldShowRegistrationForm() throws Exception {
-        mockMvc.perform(get("/register"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("register"))
-                .andExpect(model().attributeExists("user"));
+        mockMvc.perform(MockMvcRequestBuilders.get("/register"))
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("register"))
+                .andExpect(MockMvcResultMatchers.model().attributeExists("user"));
     }
 
     @Test
@@ -63,15 +66,17 @@ public class AuthControllerTest {
         when(userService.findByEmail(anyString())).thenReturn(null);
         doNothing().when(userService).saveUser(any(UserDto.class));
 
-        mockMvc.perform(post("/register/save")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        mockMvc.perform(MockMvcRequestBuilders.post("/register/save")
+                        // --- THIS LINE IS NOW FIXED ---
+                        .contentType(APPLICATION_FORM_URLENCODED) 
                         .param("name", userDto.getName())
                         .param("email", userDto.getEmail())
                         .param("password", userDto.getPassword())
                         .with(csrf())
                 )
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/register?success"));
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/register?success"));
     }
 
     @Test
@@ -79,23 +84,27 @@ public class AuthControllerTest {
     void shouldFailRegistrationWhenEmailExists() throws Exception {
         when(userService.findByEmail(userDto.getEmail())).thenReturn(existingUser);
 
-        mockMvc.perform(post("/register/save")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        mockMvc.perform(MockMvcRequestBuilders.post("/register/save")
+                        // --- THIS LINE IS NOW FIXED ---
+                        .contentType(APPLICATION_FORM_URLENCODED)
                         .param("name", userDto.getName())
                         .param("email", userDto.getEmail())
                         .param("password", userDto.getPassword())
                         .with(csrf())
                 )
-                .andExpect(status().isOk())
-                .andExpect(view().name("register"))
-                .andExpect(model().attributeHasFieldErrors("user", "email"));
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("register"))
+                .andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("user", "email"))
+                .andExpect(MockMvcResultMatchers.model().attributeExists("user"));
     }
 
     @Test
     @WithAnonymousUser
     void shouldShowLoginPage() throws Exception {
-         mockMvc.perform(get("/login"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("login"));
+         mockMvc.perform(MockMvcRequestBuilders.get("/login"))
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("login"));
     }
 }

@@ -35,6 +35,8 @@
             color: var(--text-dark);
             display: flex;
             align-items: center;
+            /* This ensures the price and button don't wrap */
+            flex-shrink: 0; 
          }
         .no-results {
             text-align: center;
@@ -55,12 +57,17 @@
             background-color: #fdd;
             border-color: var(--danger);
         }
+        .content-container {
+            width: 90%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
     <div th:replace="~{fragments/header :: header}"></div>
 
-    <div class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
+    <div class="content-container" style="padding-top: 2rem; padding-bottom: 2rem;">
         <h2>Hotels in <span th:text="${city}">City</span></h2>
         <p>Showing availability from <strong th:text="${#temporals.format(checkInDate, 'dd MMM yyyy')}"></strong> to <strong th:text="${#temporals.format(checkOutDate, 'dd MMM yyyy')}"></strong></p>
 
@@ -79,10 +86,12 @@
 
                 <h4>Available Rooms:</h4>
                 <div th:each="room : ${hotel.availableRooms}" class="room-info">
+                   
                    <div class="room-details">
                        <strong th:text="${room.roomType}">Room Type</strong> <br/>
                        <span>Capacity: <span th:text="${room.capacity}"></span> guests</span>
                    </div>
+                   
                    <div class="room-price">
                        <span style="margin-right: 1rem;" th:text="${#numbers.formatCurrency(room.pricePerNight)} + ' / night'">$150.00 / night</span>
                        

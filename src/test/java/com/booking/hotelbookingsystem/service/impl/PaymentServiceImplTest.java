@@ -2,6 +2,7 @@ package com.booking.hotelbookingsystem.service.impl;
 
 import com.booking.hotelbookingsystem.model.Booking;
 import com.booking.hotelbookingsystem.model.Payment;
+import com.booking.hotelbookingsystem.repository.BookingRepository; // Import the missing repository
 import com.booking.hotelbookingsystem.repository.PaymentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime; // Re-add this import for the test
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,6 +25,11 @@ public class PaymentServiceImplTest {
 
     @Mock
     private PaymentRepository paymentRepository;
+
+    // --- THIS IS THE FIX ---
+    @Mock 
+    private BookingRepository bookingRepository;
+    // --- END FIX ---
 
     @InjectMocks
     private PaymentServiceImpl paymentService;
@@ -40,11 +47,15 @@ public class PaymentServiceImplTest {
     @Test
     void shouldProcessPaymentAndRecordSuccess() {
         // Arrange
+        // We don't need to mock bookingRepository.save(), as its default
+        // (returning null) is fine since we don't use the result.
+        
         when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> {
             Payment p = invocation.getArgument(0);
-            p.setId(1L);
+            p.setId(1L); // Simulate ID generation
             return p;
         });
+
         ArgumentCaptor<Payment> paymentCaptor = ArgumentCaptor.forClass(Payment.class);
 
         // Act
@@ -52,6 +63,8 @@ public class PaymentServiceImplTest {
 
         // Assert
         verify(paymentRepository, times(1)).save(paymentCaptor.capture());
+        verify(bookingRepository, times(1)).save(any(Booking.class)); // Verify it was called
+        
         Payment savedPayment = paymentCaptor.getValue();
 
         assertThat(savedPayment.getBooking()).isEqualTo(booking);
