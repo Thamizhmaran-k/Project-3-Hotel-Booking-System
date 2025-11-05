@@ -16,7 +16,7 @@ import java.util.UUID;
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final BookingRepository bookingRepository;
+    private final BookingRepository bookingRepository; 
 
     public PaymentServiceImpl(PaymentRepository paymentRepository, BookingRepository bookingRepository) {
         this.paymentRepository = paymentRepository;
@@ -29,24 +29,23 @@ public class PaymentServiceImpl implements PaymentService {
         if (booking == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Invalid booking or amount for payment.");
         }
-
         String simulatedTransactionId = "txn_" + UUID.randomUUID().toString().substring(0, 10);
-
         Payment payment = new Payment();
         payment.setBooking(booking);
         payment.setAmount(amount);
         payment.setPaymentDate(LocalDateTime.now());
         payment.setPaymentStatus("SUCCESS");
-        
-        // --- THIS IS THE FIX ---
-        // Changed "simsimulatedTransactionId" to "simulatedTransactionId"
         payment.setTransactionId(simulatedTransactionId);
-        // --- END FIX ---
         
-        // Update the booking status from PENDING to CONFIRMED
         booking.setStatus("CONFIRMED");
         bookingRepository.save(booking);
 
         return paymentRepository.save(payment);
+    }
+
+    // --- ADD THIS METHOD ---
+    @Override
+    public long countSuccessfulPayments() {
+        return paymentRepository.countByPaymentStatus("SUCCESS");
     }
 }

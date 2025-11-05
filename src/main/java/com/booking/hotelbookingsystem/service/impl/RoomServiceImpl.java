@@ -27,10 +27,8 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     public void saveRoom(RoomDto roomDto) {
-        // Find the hotel this room belongs to
         Hotel hotel = hotelRepository.findById(roomDto.getHotelId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Hotel ID:" + roomDto.getHotelId()));
-
         Room room = new Room();
         mapDtoToEntity(roomDto, room, hotel);
         roomRepository.save(room);
@@ -39,10 +37,8 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional(readOnly = true)
     public List<RoomDto> findRoomsByHotelId(Long hotelId) {
-        // We can find rooms by fetching the hotel and getting its room list
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new EntityNotFoundException("Hotel not found with ID: " + hotelId));
-
         return hotel.getRooms().stream()
                 .map(this::mapEntityToDto)
                 .collect(Collectors.toList());
@@ -61,8 +57,6 @@ public class RoomServiceImpl implements RoomService {
     public void updateRoom(RoomDto roomDto) {
         Room room = roomRepository.findById(roomDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Room not found with ID: " + roomDto.getId()));
-        
-        // Hotel association is not typically changed, so we don't pass it to the helper
         mapDtoToEntity(roomDto, room, null);
         roomRepository.save(room);
     }
@@ -73,12 +67,16 @@ public class RoomServiceImpl implements RoomService {
         if (!roomRepository.existsById(roomId)) {
             throw new EntityNotFoundException("Room not found with ID: " + roomId);
         }
-        // Add check for bookings before deleting in a real app
         roomRepository.deleteById(roomId);
+    }
+
+    // --- ADD THIS METHOD ---
+    @Override
+    public long countRooms() {
+        return roomRepository.count();
     }
     
     // --- Helper Methods ---
-
     private RoomDto mapEntityToDto(Room room) {
         RoomDto dto = new RoomDto();
         dto.setId(room.getId());
@@ -96,7 +94,7 @@ public class RoomServiceImpl implements RoomService {
         entity.setCapacity(dto.getCapacity());
         entity.setPricePerNight(dto.getPricePerNight());
         if (hotel != null) {
-            entity.setHotel(hotel); // Only set hotel on creation
+            entity.setHotel(hotel);
         }
     }
 }

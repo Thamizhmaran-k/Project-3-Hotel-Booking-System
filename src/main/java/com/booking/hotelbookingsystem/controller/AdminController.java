@@ -3,9 +3,8 @@ package com.booking.hotelbookingsystem.controller;
 import com.booking.hotelbookingsystem.dto.HotelDto;
 import com.booking.hotelbookingsystem.dto.RoomDto;
 import com.booking.hotelbookingsystem.model.Hotel;
-import com.booking.hotelbookingsystem.repository.*;
-import com.booking.hotelbookingsystem.service.HotelService;
-import com.booking.hotelbookingsystem.service.RoomService;
+// --- REPOSITORIES ARE REMOVED FROM IMPORTS ---
+import com.booking.hotelbookingsystem.service.*; // Import all services
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -15,44 +14,40 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/admin") // All routes in this controller start with /admin
+@RequestMapping("/admin")
 public class AdminController {
 
+    // --- DEPENDENCIES ARE NOW ONLY SERVICES ---
     private final HotelService hotelService;
     private final RoomService roomService;
-    
-    // Repositories for dashboard stats
-    private final UserRepository userRepository;
-    private final BookingRepository bookingRepository;
-    private final HotelRepository hotelRepository;
-    private final PaymentRepository paymentRepository;
+    private final UserService userService;
+    private final BookingService bookingService;
+    private final PaymentService paymentService;
 
+    // --- UPDATED CONSTRUCTOR ---
     public AdminController(HotelService hotelService, RoomService roomService,
-                           UserRepository userRepository, BookingRepository bookingRepository,
-                           HotelRepository hotelRepository, PaymentRepository paymentRepository) {
+                           UserService userService, BookingService bookingService,
+                           PaymentService paymentService) {
         this.hotelService = hotelService;
         this.roomService = roomService;
-        this.userRepository = userRepository;
-        this.bookingRepository = bookingRepository;
-        this.hotelRepository = hotelRepository;
-        this.paymentRepository = paymentRepository;
+        this.userService = userService;
+        this.bookingService = bookingService;
+        this.paymentService = paymentService;
     }
 
-    // --- THIS IS THE METHOD FOR THE PAGE THAT IS NOT FOUND ---
+    // --- UPDATED DASHBOARD METHOD ---
     @GetMapping("/dashboard")
     public String showAdminDashboard(Model model) {
-        // Fetch real counts from the repositories
-        model.addAttribute("totalUsers", userRepository.count());
-        model.addAttribute("totalHotels", hotelRepository.count());
-        model.addAttribute("totalBookings", bookingRepository.count());
-        // Use the new repository method to count only successful payments
-        model.addAttribute("totalSuccessfulPayments", paymentRepository.countByPaymentStatus("SUCCESS"));
+        // Fetch real counts from the services
+        model.addAttribute("totalUsers", userService.countUsers());
+        model.addAttribute("totalHotels", hotelService.countHotels());
+        model.addAttribute("totalBookings", bookingService.countBookings());
+        model.addAttribute("totalSuccessfulPayments", paymentService.countSuccessfulPayments());
         
-        return "admin/dashboard"; // This tells it to load "admin/dashboard.html"
+        return "admin/dashboard";
     }
 
-    // --- Hotel CRUD Methods ---
-
+    // --- Hotel CRUD (No Changes) ---
     @GetMapping("/hotels")
     public String showHotelList(Model model) {
         model.addAttribute("hotels", hotelService.findAllHotels());
@@ -116,8 +111,7 @@ public class AdminController {
     }
 
     
-    // --- Room CRUD Methods ---
-
+    // --- Room CRUD (No Changes) ---
     @GetMapping("/hotels/{hotelId}/rooms")
     public String showHotelRooms(@PathVariable("hotelId") Long hotelId, Model model, RedirectAttributes redirectAttributes) {
         try {
@@ -153,8 +147,10 @@ public class AdminController {
                            Model model, RedirectAttributes redirectAttributes) {
         
         roomDto.setHotelId(hotelId);
-        Hotel hotel = hotelService.findHotelById(hotelId);
-        if (hotel == null) {
+        Hotel hotel;
+        try {
+            hotel = hotelService.findHotelById(hotelId);
+        } catch (EntityNotFoundException e) {
              redirectAttributes.addFlashAttribute("errorMessage", "Hotel not found.");
              return "redirect:/admin/hotels";
         }
@@ -198,8 +194,12 @@ public class AdminController {
         roomDto.setId(roomId);
         
         if (bindingResult.hasErrors()) {
-            Hotel hotel = hotelService.findHotelById(roomDto.getHotelId());
-            model.addAttribute("hotelName", hotel.getName());
+            try {
+                Hotel hotel = hotelService.findHotelById(roomDto.getHotelId());
+                model.addAttribute("hotelName", hotel.getName());
+            } catch (EntityNotFoundException e) {
+                // Handle case where hotel ID is missing/invalid during an error
+            }
             return "admin/rooms-edit";
         }
 

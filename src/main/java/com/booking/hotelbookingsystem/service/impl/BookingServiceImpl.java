@@ -32,39 +32,29 @@ public class BookingServiceImpl implements BookingService {
         this.roomRepository = roomRepository;
         this.paymentRepository = paymentRepository;
     }
-
+    
     @Override
     @Transactional
     public BookingDto createBooking(Long roomId, User user, LocalDate checkInDate, LocalDate checkOutDate) {
-        
         if (checkInDate == null || checkOutDate == null || checkOutDate.isBefore(checkInDate) || checkInDate.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("Invalid booking dates provided.");
         }
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null.");
         }
-
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Room ID: " + roomId));
-
         boolean isAvailable = isRoomAvailable(roomId, checkInDate, checkOutDate);
         if (!isAvailable) {
             throw new IllegalStateException("Sorry, the room is not available for the selected dates.");
         }
-
         Booking booking = new Booking();
         booking.setUser(user);
         booking.setRoom(room);
         booking.setCheckInDate(checkInDate);
         booking.setCheckOutDate(checkOutDate);
-        
-        // --- THIS IS THE FIX ---
-        // Set status to PENDING until payment is complete
         booking.setStatus("PENDING"); 
-        // --- END FIX ---
-
         Booking savedBooking = bookingRepository.save(booking);
-
         return mapToBookingDto(savedBooking);
     }
 
@@ -89,14 +79,11 @@ public class BookingServiceImpl implements BookingService {
     public void cancelBooking(Long bookingId, User user) {
         Booking booking = bookingRepository.findByIdAndUserId(bookingId, user.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found or you are not authorized to cancel it."));
-
         if ("CANCELLED".equals(booking.getStatus())) {
             throw new IllegalStateException("This booking has already been cancelled.");
         }
-        
         booking.setStatus("CANCELLED");
         bookingRepository.save(booking);
-
         Optional<Payment> paymentOpt = paymentRepository.findByBooking(booking);
         if (paymentOpt.isPresent()) {
             Payment payment = paymentOpt.get();
@@ -105,11 +92,14 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-
+    // --- ADD THIS METHOD ---
+    @Override
+    public long countBookings() {
+        return bookingRepository.count();
+    }
+    
     // --- Helper Methods ---
-
     private boolean isRoomAvailable(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
-        // We now check for PENDING or CONFIRMED bookings
         List<Booking> overlappingBookings = bookingRepository.findOverlappingBookings(roomId, checkInDate, checkOutDate);
         return overlappingBookings.isEmpty();
     }
@@ -120,7 +110,6 @@ public class BookingServiceImpl implements BookingService {
         dto.setCheckInDate(booking.getCheckInDate());
         dto.setCheckOutDate(booking.getCheckOutDate());
         dto.setStatus(booking.getStatus());
-
         if (booking.getUser() != null) {
             dto.setUserId(booking.getUser().getId());
             dto.setUserName(booking.getUser().getName());

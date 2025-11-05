@@ -1,7 +1,6 @@
 package com.booking.hotelbookingsystem.service;
 
 import com.booking.hotelbookingsystem.dto.RoomDto;
-
 import java.util.List;
 
 public interface RoomService {
@@ -10,4 +9,7 @@ public interface RoomService {
     RoomDto findRoomDtoById(Long roomId);
     void updateRoom(RoomDto roomDto);
     void deleteRoom(Long roomId);
+    
+    // --- ADD THIS METHOD ---
+    long countRooms();
 }

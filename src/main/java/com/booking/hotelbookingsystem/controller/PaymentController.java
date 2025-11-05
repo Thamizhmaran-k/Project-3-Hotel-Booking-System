@@ -27,7 +27,9 @@ public class PaymentController {
     private String stripeSecretKey;
 
     // --- THIS IS THE FIX ---
-    @Value("${app.base-url}") // Injects the URL from application.properties
+    // We add a default value ":http://localhost:8080"
+    // This value will be used *only* if 'app.base-url' is not found (like during this test)
+    @Value("${app.base-url:http://localhost:8080}") 
     private String baseUrl;
     // --- END FIX ---
 
@@ -41,6 +43,7 @@ public class PaymentController {
     
     @PostConstruct
     public void init() {
+        // Set the API key for the Stripe library
         Stripe.apiKey = stripeSecretKey;
     }
 
@@ -67,13 +70,11 @@ public class PaymentController {
         
         long amountInCents = totalPrice.multiply(BigDecimal.valueOf(100)).longValue();
 
-        // The baseUrl variable is now dynamic from your properties file
-        
         try {
             SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                // Use the injected baseUrl variable here
+                // Use the injected baseUrl variable
                 .setSuccessUrl(baseUrl + "/payment/success?session_id={CHECKOUT_SESSION_ID}&booking_id=" + bookingId)
                 .setCancelUrl(baseUrl + "/payment/cancel?booking_id=" + bookingId)
                 .addLineItem(
@@ -81,7 +82,7 @@ public class PaymentController {
                         .setQuantity(1L)
                         .setPriceData(
                             SessionCreateParams.LineItem.PriceData.builder()
-                                .setCurrency("usd") 
+                                .setCurrency("usd") // Use "usd" for Stripe test accounts
                                 .setUnitAmount(amountInCents)
                                 .setProductData(
                                     SessionCreateParams.LineItem.PriceData.ProductData.builder()
@@ -111,6 +112,7 @@ public class PaymentController {
         try {
             Session session = Session.retrieve(sessionId);
             
+            // Check if payment was actually paid
             if ("paid".equals(session.getPaymentStatus())) {
                 Booking booking = bookingService.findBookingById(bookingId);
                 BigDecimal amountPaid = BigDecimal.valueOf(session.getAmountTotal()).divide(BigDecimal.valueOf(100));

@@ -2,9 +2,13 @@ package com.booking.hotelbookingsystem.controller;
 
 import com.booking.hotelbookingsystem.config.SecurityConfig;
 import com.booking.hotelbookingsystem.dto.HotelDto;
-import com.booking.hotelbookingsystem.repository.*;
+// Import Services
+import com.booking.hotelbookingsystem.service.BookingService;
 import com.booking.hotelbookingsystem.service.HotelService;
+import com.booking.hotelbookingsystem.service.PaymentService;
 import com.booking.hotelbookingsystem.service.RoomService;
+import com.booking.hotelbookingsystem.service.UserService;
+// We no longer need to import Repositories
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,14 +38,14 @@ public class AdminControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    // Mock all dependencies of AdminController
+    // --- MOCKS ARE NOW SERVICES ---
     @MockBean private HotelService hotelService;
     @MockBean private RoomService roomService;
-    @MockBean private UserRepository userRepository;
-    @MockBean private BookingRepository bookingRepository;
-    @MockBean private HotelRepository hotelRepository;
-    @MockBean private PaymentRepository paymentRepository;
-    @MockBean private UserDetailsService userDetailsService;
+    @MockBean private UserService userService;
+    @MockBean private BookingService bookingService;
+    @MockBean private PaymentService paymentService;
+    
+    @MockBean private UserDetailsService userDetailsService; // Mock security dependency
 
     private HotelDto hotelDto;
 
@@ -54,8 +58,25 @@ public class AdminControllerTest {
         hotelDto.setAddress("123 Test St");
     }
 
+    // --- NEW TEST for the Dashboard ---
     @Test
-    @WithMockUser(roles = "ADMIN") // Test as ADMIN
+    @WithMockUser(roles = "ADMIN")
+    void shouldShowAdminDashboard() throws Exception {
+        // Mock the new service calls
+        when(userService.countUsers()).thenReturn(5L);
+        when(hotelService.countHotels()).thenReturn(2L);
+        when(bookingService.countBookings()).thenReturn(10L);
+        when(paymentService.countSuccessfulPayments()).thenReturn(8L);
+
+        mockMvc.perform(get("/admin/dashboard"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/dashboard"))
+                .andExpect(model().attribute("totalUsers", 5L))
+                .andExpect(model().attribute("totalHotels", 2L));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void shouldShowHotelListForAdmin() throws Exception {
         when(hotelService.findAllHotels()).thenReturn(Collections.singletonList(hotelDto));
 
@@ -66,10 +87,10 @@ public class AdminControllerTest {
     }
 
      @Test
-     @WithMockUser(roles = "USER") // Test as USER
+     @WithMockUser(roles = "USER")
      void shouldDenyAccessToHotelListForUser() throws Exception {
          mockMvc.perform(get("/admin/hotels"))
-                .andExpect(status().isForbidden()); // Expect 403 Forbidden
+                .andExpect(status().isForbidden());
      }
 
      @Test
@@ -103,12 +124,12 @@ public class AdminControllerTest {
     void shouldFailSaveHotelWhenNameIsEmpty() throws Exception {
         mockMvc.perform(post("/admin/hotels/add")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("name", "") // Send empty name
+                        .param("name", "")
                         .param("city", hotelDto.getCity())
                         .param("address", hotelDto.getAddress())
                         .with(csrf())
                 )
-                .andExpect(status().isOk()) // Expect 200 OK (return to form)
+                .andExpect(status().isOk())
                 .andExpect(view().name("admin/hotels-add"))
                 .andExpect(model().attributeExists("hotel"))
                 .andExpect(model().attributeHasFieldErrors("hotel", "name"));

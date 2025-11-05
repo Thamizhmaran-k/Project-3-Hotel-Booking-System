@@ -31,13 +31,10 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
-        // Encrypt the password
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
-        // Find the "ROLE_USER" created by our DataInitializer
         Role userRole = roleRepository.findByName("ROLE_USER");
         if (userRole == null) {
-            // This is a safeguard in case the initializer failed
             userRole = new Role("ROLE_USER");
             roleRepository.save(userRole);
         }
@@ -49,5 +46,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    // --- ADD THIS METHOD ---
+    @Override
+    public long countUsers() {
+        return userRepository.count();
     }
 }
