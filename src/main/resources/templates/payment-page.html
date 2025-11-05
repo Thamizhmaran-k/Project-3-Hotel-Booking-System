@@ -14,21 +14,18 @@
 
     <div class="container">
         <div class="payment-card">
-            <h2>Simulated Payment</h2>
-            <p>You are about to pay for your booking.</p>
+            <h2>Confirm Your Payment</h2>
+            <p>You will be securely redirected to Stripe to complete your payment.</p>
 
             <div class="amount-display">
                 Total Amount: <span th:text="${#numbers.formatCurrency(totalPrice)}"></span>
             </div>
 
-            <p style="color: var(--text-light); font-size: 0.9rem;">(This is a simulation. No real payment will be processed.)</p>
-
-             <form th:action="@{/payment/process}" method="post" style="margin-top: 2rem;">
+            <form th:action="@{/payment/create-checkout-session}" method="post" style="margin-top: 2rem;">
                  <input type="hidden" name="bookingId" th:value="${booking.id}" />
-                <input type="hidden" name="amount" th:value="${totalPrice}" />
-
-                <button type="submit" class="btn btn-primary">Confirm Payment (Simulated)</button>
-                 <a th:href="@{/my-bookings}" class="btn btn-outline" style="margin-top: 0.5rem;">Cancel Payment</a>
+                
+                <button type="submit" class="btn btn-primary">Pay with Stripe</button>
+                <a th:href="@{/my-bookings}" class="btn btn-outline" style="margin-top: 0.5rem;">Cancel Payment</a>
             </form>
         </div>
     </div>

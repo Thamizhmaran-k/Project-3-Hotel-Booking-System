@@ -4,8 +4,16 @@
     <title>My Bookings</title>
     <div th:replace="~{fragments/header :: head}"></div>
      <style>
+        /* These styles are copied from admin/hotels-list.html for consistency */
+        .content-card {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--bg-white);
+            padding: 2.5rem;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
         .booking-card { 
-            background-color: #fff; 
             border: 1px solid var(--border-color); 
             border-radius: 8px; 
             margin-bottom: 1.5rem; 
@@ -65,42 +73,42 @@
 <body>
     <div th:replace="~{fragments/header :: header}"></div>
 
-    <div class="container" style="padding-top: 2rem; padding-bottom: 2rem; max-width: 900px;">
-        <h2>My Bookings</h2>
+    <div class="content-container">
+        <div class="content-card">
+            <h2>My Bookings</h2>
 
-        <div th:if="${successMessage}" class="flash-message flash-success" th:text="${successMessage}"></div>
-        <div th:if="${errorMessage}" class="flash-message flash-error" th:text="${errorMessage}"></div>
+            <div th:if="${successMessage}" class="flash-message flash-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="flash-message flash-error" th:text="${errorMessage}"></div>
 
-         <div th:if="${#lists.isEmpty(bookings)}">
-            <p>You haven't made any bookings yet.</p>
-         </div>
+             <div th:if="${#lists.isEmpty(bookings)}">
+                <p>You haven't made any bookings yet.</p>
+             </div>
 
-        <div th:unless="${#lists.isEmpty(bookings)}">
-            <div th:each="booking : ${bookings}" class="booking-card">
-                
-                <div class="booking-header">
-                    <h4>Booking ID: #<span th:text="${booking.id}">123</span></h4>
-                     <span class="booking-status"
-                          th:classappend="${booking.status == 'CONFIRMED' ? 'status-confirmed' : 'status-cancelled'}"
-                          th:text="${booking.status}">CONFIRMED</span>
-                </div>
-
-                <div class="booking-details">
-                    <p><strong>Hotel:</strong> <span th:text="${booking.hotelName}">Hotel Name</span></p>
-                    <p><strong>Room:</strong> <span th:text="${booking.roomType}">Room Type</span></p>
-                    <p><strong>Check-in:</strong> <span th:text="${#temporals.format(booking.checkInDate, 'EEE, dd MMM yyyy')}"></span></p>
-                    <p><strong>Check-out:</strong> <span th:text="${#temporals.format(booking.checkOutDate, 'EEE, dd MMM yyyy')}"></span></p>
+            <div th:unless="${#lists.isEmpty(bookings)}">
+                <div th:each="booking : ${bookings}" class="booking-card">
                     
-                    <div th:if="${booking.status == 'CONFIRMED'}" style="margin-top: 1rem; text-align: right;">
-                        <form th:action="@{/booking/cancel/{bookingId}(bookingId=${booking.id})}" method="post" 
-                              onsubmit="return confirm('Are you sure you want to cancel this booking?');">
-                            <button type="submit" class="btn btn-danger btn-small">Cancel Booking</button>
-                        </form>
+                    <div class="booking-header">
+                        <h4>Booking ID: #<span th:text="${booking.id}">123</span></h4>
+                        <span class="booking-status"
+                              th:classappend="${booking.status == 'CONFIRMED' ? 'status-confirmed' : (booking.status == 'CANCELLED' ? 'status-cancelled' : 'status-refund_pending')}"
+                              th:text="${booking.status}">CONFIRMED</span>
                     </div>
-                     </div>
-            </div>
-        </div>
-    </div>
 
-</body>
+                    <div class="booking-details">
+                        <p><strong>Hotel:</strong> <span th:text="${booking.hotelName}">Hotel Name</span></p>
+                        <p><strong>Room:</strong> <span th:text="${booking.roomType}">Room Type</span></p>
+                        <p><strong>Check-in:</strong> <span th:text="${#temporals.format(booking.checkInDate, 'EEE, dd MMM yyyy')}"></span></p>
+                        <p><strong>Check-out:</strong> <span th:text="${#temporals.format(booking.checkOutDate, 'EEE, dd MMM yyyy')}"></span></p>
+                        
+                        <div th:if="${booking.status == 'CONFIRMED'}" style="margin-top: 1rem; text-align: right;">
+                            <form th:action="@{/booking/cancel/{bookingId}(bookingId=${booking.id})}" method="post" 
+                                  onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                                <button type="submit" class="btn btn-danger btn-small">Cancel Booking</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div> </div> </body>
 </html>

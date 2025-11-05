@@ -7,8 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-// We no longer need AntPathRequestMatcher
-// import org.springframework.security.web.util.matcher.AntPathRequestMatcher; 
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -22,52 +21,46 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // CSRF should be enabled in production
+                .csrf(csrf -> csrf.disable())
                 
-                // Define authorization rules for different paths
                 .authorizeHttpRequests((authorize) ->
                         authorize
-                                // --- MODERN FIX: Use direct path strings ---
                                 .requestMatchers(
                                         "/",
                                         "/register/**",
                                         "/login/**",
-                                        "/search/**",
+                                        "/search/**", // Search is public
                                         "/css/**",
                                         "/js/**",
-                                        "/images/**" // Allow images folder
+                                        "/images/**" 
                                 ).permitAll()
                                 
-                                // Admin-only paths
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 
-                                // Paths for any authenticated user (USER or ADMIN)
                                 .requestMatchers(
                                         "/profile/**",
                                         "/my-bookings/**",
-                                        "/book/**",
-                                        "/payment/**"
+                                        "/book/**",     // Booking requires login
+                                        "/payment/**"   // Payment requires login
                                 ).authenticated()
-                                // --- END MODERN FIX ---
                                 
-                                // All other requests must be authenticated
                                 .anyRequest().authenticated()
                 )
                 .formLogin(
                         form -> form
                                 .loginPage("/login") 
                                 .loginProcessingUrl("/login") 
-                                .defaultSuccessUrl("/profile", true) 
+                                // *** THIS IS THE FIX ***
+                                // We remove 'true' so it redirects to the saved page
+                                .defaultSuccessUrl("/profile") 
                                 .permitAll() 
                 )
-                // --- MODERN LOGOUT FIX ---
                 .logout(
                         logout -> logout
-                                .logoutUrl("/logout") // Specify the URL to trigger logout
-                                .logoutSuccessUrl("/login?logout") // Redirect after logout
+                                .logoutUrl("/logout")
+                                .logoutSuccessUrl("/login?logout")
                                 .permitAll() 
                 );
-                // --- END FIX ---
         
         return http.build();
     }

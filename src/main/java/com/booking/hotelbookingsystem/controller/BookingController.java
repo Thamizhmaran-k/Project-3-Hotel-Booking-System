@@ -2,24 +2,23 @@ package com.booking.hotelbookingsystem.controller;
 
 import com.booking.hotelbookingsystem.dto.BookingDto;
 import com.booking.hotelbookingsystem.model.Booking;
-import com.booking.hotelbookingsystem.model.Payment;
 import com.booking.hotelbookingsystem.model.Room;
 import com.booking.hotelbookingsystem.model.User;
 import com.booking.hotelbookingsystem.repository.RoomRepository;
 import com.booking.hotelbookingsystem.service.BookingService;
-import com.booking.hotelbookingsystem.service.PaymentService;
 import com.booking.hotelbookingsystem.service.UserService;
-
-// --- ADD THIS IMPORT ---
 import jakarta.persistence.EntityNotFoundException;
-// --- END IMPORT ---
-
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+// --- THIS IS THE FIX ---
+import org.springframework.web.bind.annotation.RequestParam;
+// --- END FIX ---
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
@@ -33,14 +32,12 @@ public class BookingController {
     private final BookingService bookingService;
     private final UserService userService;
     private final RoomRepository roomRepository;
-    private final PaymentService paymentService;
 
     public BookingController(BookingService bookingService, UserService userService,
-                             RoomRepository roomRepository, PaymentService paymentService) {
+                             RoomRepository roomRepository) {
         this.bookingService = bookingService;
         this.userService = userService;
         this.roomRepository = roomRepository;
-        this.paymentService = paymentService;
     }
 
     @GetMapping("/book/{roomId}")
@@ -100,55 +97,7 @@ public class BookingController {
             return "redirect:" + searchUrl;
         }
     }
-
-    @GetMapping("/payment/{bookingId}")
-    public String showPaymentPage(@PathVariable("bookingId") Long bookingId, Model model, RedirectAttributes redirectAttributes) {
-         try {
-             Booking booking = bookingService.findBookingById(bookingId);
-             
-             long numberOfNights = ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate());
-             if (numberOfNights <= 0) numberOfNights = 1;
-             BigDecimal totalPrice = booking.getRoom().getPricePerNight().multiply(BigDecimal.valueOf(numberOfNights));
-
-             model.addAttribute("booking", booking);
-             model.addAttribute("totalPrice", totalPrice);
-
-             return "payment-page";
-
-         } catch (Exception e) {
-             redirectAttributes.addFlashAttribute("errorMessage", "Invalid booking for payment.");
-             return "redirect:/my-bookings";
-         }
-    }
-
-    @PostMapping("/payment/process")
-    public String processPayment(
-            @RequestParam("bookingId") Long bookingId,
-            @RequestParam("amount") BigDecimal amount,
-            RedirectAttributes redirectAttributes) {
-
-         Booking booking = bookingService.findBookingById(bookingId);
-         if (booking == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Booking not found.");
-            return "redirect:/my-bookings";
-         }
-
-         try {
-            Payment payment = paymentService.processPayment(booking, amount); 
-
-            if ("SUCCESS".equals(payment.getPaymentStatus())) {
-                 redirectAttributes.addFlashAttribute("successMessage", "Payment successful! Your booking is confirmed.");
-            } else {
-                 redirectAttributes.addFlashAttribute("errorMessage", "Payment failed. Please try again.");
-            }
-            return "redirect:/my-bookings";
-
-         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Error processing payment: " + e.getMessage());
-            return "redirect:/payment/" + bookingId;
-         }
-    }
-
+    
      @GetMapping("/my-bookings")
      public String showMyBookings(Model model) {
          Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -164,7 +113,6 @@ public class BookingController {
         return "my-bookings";
      }
 
-    // --- METHOD WITH THE ERROR ---
     @PostMapping("/booking/cancel/{bookingId}")
     public String cancelBooking(@PathVariable("bookingId") Long bookingId,
                                 RedirectAttributes redirectAttributes) {
@@ -175,14 +123,12 @@ public class BookingController {
              return "redirect:/login";
         }
 
-        // --- FIX IS HERE: Catch the specific exceptions ---
         try {
             bookingService.cancelBooking(bookingId, user);
             redirectAttributes.addFlashAttribute("successMessage", "Booking #" + bookingId + " has been cancelled.");
-        } catch (EntityNotFoundException | IllegalStateException e) { // Use imported EntityNotFoundException
+        } catch (EntityNotFoundException | IllegalStateException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        // --- END FIX ---
 
         return "redirect:/my-bookings";
     }
