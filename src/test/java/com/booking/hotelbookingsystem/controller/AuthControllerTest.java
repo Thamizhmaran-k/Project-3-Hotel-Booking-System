@@ -17,8 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -28,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 @WebMvcTest(AuthController.class)
 @Import(SecurityConfig.class)
-@SuppressWarnings("deprecation") // Suppress warnings for @MockBean
+@SuppressWarnings("deprecation")
 public class AuthControllerTest {
 
     @Autowired
@@ -67,8 +65,7 @@ public class AuthControllerTest {
         doNothing().when(userService).saveUser(any(UserDto.class));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/register/save")
-                        // --- THIS LINE IS NOW FIXED ---
-                        .contentType(APPLICATION_FORM_URLENCODED) 
+                        .contentType(APPLICATION_FORM_URLENCODED)
                         .param("name", userDto.getName())
                         .param("email", userDto.getEmail())
                         .param("password", userDto.getPassword())
@@ -85,7 +82,6 @@ public class AuthControllerTest {
         when(userService.findByEmail(userDto.getEmail())).thenReturn(existingUser);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/register/save")
-                        // --- THIS LINE IS NOW FIXED ---
                         .contentType(APPLICATION_FORM_URLENCODED)
                         .param("name", userDto.getName())
                         .param("email", userDto.getEmail())
