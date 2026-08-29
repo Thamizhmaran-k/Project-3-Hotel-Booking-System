@@ -4,6 +4,10 @@ A full-stack hotel booking web application built with Java, Spring Boot, Spring 
 
 The application allows users to register and log in, search for hotels, view available rooms, make bookings, and complete payments through Stripe. It also provides an admin dashboard for managing hotels and rooms.
 
+## 🌐 Live Demo
+
+🚀 **[Open Hotel Booking System](https://hotel-booking-system-etfm.onrender.com)**
+
 ## Features
 
 - User registration and authentication
