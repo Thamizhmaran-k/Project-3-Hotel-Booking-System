@@ -35,6 +35,7 @@ The application allows users to register and log in, search for hotels, view ava
 - Java 21
 - Spring Boot
 - Spring MVC
+- Spring Security
 - Spring Data JPA
 - Hibernate
 - Maven
