@@ -1,33 +1,84 @@
-HELP.md
+# ================================
+# Maven
+# ================================
 target/
-.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+# Maven Wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# ================================
+# Spring Boot / Local Configuration
+# ================================
+HELP.md
+
+# Environment variables and secrets
+.env
+.env.*
+*.env
+
+# Local Spring configuration files
+application-local.properties
+application-prod.properties
+
+# ================================
+# Eclipse / Spring Tool Suite
+# ================================
 .apt_generated
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+# ================================
+# IntelliJ IDEA
+# ================================
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# ================================
+# NetBeans
+# ================================
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
+
+# ================================
+# Gradle
+# ================================
+.gradle/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+# ================================
+# Visual Studio Code
+# ================================
 .vscode/
+
+# ================================
+# Operating System Files
+# ================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ================================
+# Logs
+# ================================
+*.log
+
+# ================================
+# Temporary Files
+# ================================
+*.tmp
+*.temp
+*.swp
+*.swo
